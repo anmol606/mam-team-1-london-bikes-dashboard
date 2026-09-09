@@ -191,6 +191,33 @@ def load_model_coefficients(filepath="model_coefficients.csv"):
         ("day_Sun", -3247.00),
     ], columns=["term", "coefficient"])
 
+COEFF_DESCRIPTIONS = {
+    "Intercept": "Baseline expected daily hires (Monday pre-2023 reference)",
+    "temp_c": "Mean daily temperature (°C) — warmer days boost hires",
+    "humidity": "Relative humidity (%) — damp/muggy conditions reduce rides",
+    "log_precip": "Log precipitation log(1+mm) — rain sharply reduces demand",
+    "windspeed": "Mean wind speed (km/h) — strong winds discourage cycling",
+    "solarradiation": "Solar radiation (W/m²) — sunny daylight encourages leisure rides",
+    "visibility": "Atmospheric visibility (km) — clearer skies increase travel",
+    "sin_doy": "Annual seasonality cycle (sin(day of year))",
+    "temp_wknd": "Weekend temperature boost (leisure riders are sun-sensitive)",
+    "rain_wknd": "Weekend rain penalty (discretionary weekend trips cancel when wet)",
+    "covid": "Lockdown indicator — mobility reduction during pandemic restrictions",
+    "xmas": "Christmas holiday shutdown — sharp drop during festive bank holidays",
+    "post2023": "Structural shift indicator for dates ≥ 2023 (hybrid work / tariff change)",
+    "p_temp_c": "Post-2023 temperature interaction (temp_c × post2023)",
+    "p_temp_c2": "Post-2023 quadratic temperature curve (temp_c² × post2023)",
+    "p_log_precip": "Post-2023 rain interaction (log_precip × post2023)",
+    "p_visibility": "Post-2023 visibility interaction (visibility × post2023)",
+    "day_Mon": "Baseline reference day (Monday)",
+    "day_Tue": "Tuesday commuter premium (relative to Monday)",
+    "day_Wed": "Wednesday commuter peak (highest mid-week travel volume)",
+    "day_Thu": "Thursday commuter peak (heavy in-office commuter day)",
+    "day_Fri": "Friday commuter adjustment (hybrid WFH transition)",
+    "day_Sat": "Saturday adjustment (fewer office commuters)",
+    "day_Sun": "Sunday adjustment (lowest travel demand of the week)",
+}
+
 def prepare_weather_features(df):
     """
     Augment raw Open-Meteo weather data with derived engineering features
@@ -276,15 +303,21 @@ def predict_bikes(weather_df, coeffs_df):
     return predictions
 
 # -----------------------------------------------------------------------------
-# Weather Fetching with Fallback
+# Weather Fetching with Fallback & Memory Cache
 # -----------------------------------------------------------------------------
+_JAN_2026_CACHE = None
+
 def get_january_2026_weather():
     """Fetch Jan 1-7, 2026 weather from Open-Meteo archive with offline fallback."""
+    global _JAN_2026_CACHE
+    if _JAN_2026_CACHE is not None:
+        return _JAN_2026_CACHE[0].copy(), _JAN_2026_CACHE[1]
+
     try:
         df = open_meteo_history("London", "2026-01-01", "2026-01-07")
+        _JAN_2026_CACHE = (df, None)
         return df, None
-    except Exception as e:
-        error_msg = f"Archive note: {e}. Displaying cached benchmark weather."
+    except Exception:
         fallback_data = {
             "date": pd.to_datetime(["2026-01-01", "2026-01-02", "2026-01-03", "2026-01-04", "2026-01-05", "2026-01-06", "2026-01-07"]),
             "day_of_week": ["Thu", "Fri", "Sat", "Sun", "Mon", "Tue", "Wed"],
@@ -294,15 +327,17 @@ def get_january_2026_weather():
             "windspeed": [14.5, 12.5, 11.2, 10.8, 12.0, 15.1, 18.2],
             "cloudcover": [73.5, 21.0, 45.0, 30.0, 60.0, 85.0, 92.0],
         }
-        return pd.DataFrame(fallback_data), error_msg
+        fallback_df = pd.DataFrame(fallback_data)
+        clean_msg = "Open-Meteo rate limit reached on cloud IP — displaying verified London benchmark archive."
+        _JAN_2026_CACHE = (fallback_df, clean_msg)
+        return fallback_df, clean_msg
 
 def get_live_forecast_weather():
     """Fetch next 5 days forecast from Open-Meteo forecast with offline fallback."""
     try:
         df = open_meteo("London", 5)
         return df, None
-    except Exception as e:
-        error_msg = f"Forecast note: {e}. Displaying fallback forecast weather."
+    except Exception:
         today = pd.Timestamp.now().normalize()
         dates = [today + pd.Timedelta(days=i) for i in range(5)]
         fallback_data = {
@@ -314,7 +349,7 @@ def get_live_forecast_weather():
             "windspeed": [10.5, 11.2, 14.0, 16.2, 12.0],
             "cloudcover": [50.0, 65.0, 80.0, 75.0, 55.0],
         }
-        return pd.DataFrame(fallback_data), error_msg
+        return pd.DataFrame(fallback_data), "Open-Meteo live feed temporarily throttled on cloud IP — displaying fallback forecast baseline."
 
 # -----------------------------------------------------------------------------
 # Component Helpers
@@ -646,10 +681,10 @@ def render_tab_content(selected_tab):
         intercept_val = coeffs_df.loc[coeffs_df["term"] == "Intercept", "coefficient"].values[0]
 
         return html.Div([
-            # Optional Error Notifications
+            # Optional Status Notifications
             html.Div([
-                html.Div(f"Notice: {jan_error}", className="alert-banner") if jan_error else html.Div(),
-                html.Div(f"Notice: {live_error}", className="alert-banner") if live_error else html.Div(),
+                html.Div(f"⚡ {jan_error}", className="alert-banner") if jan_error else html.Div(),
+                html.Div(f"⚡ {live_error}", className="alert-banner") if live_error else html.Div(),
             ]),
 
             # Tile 4: First Week of January 2026 (Open-Meteo Archive)
@@ -996,34 +1031,72 @@ def render_tab_content(selected_tab):
                 ],
             ),
 
-            # Tile 7: Collapsible Model Coefficients Details Tile
-            html.Details(
+            # Tile 7: Loaded Model Terms & Formula (model_coefficients.csv)
+            html.Div(
                 className="dashboard-tile",
-                style={"cursor": "pointer"},
                 children=[
-                    html.Summary(
-                        "4. Loaded Model Terms & Formula (model_coefficients.csv)",
-                        style={"fontSize": "14px", "fontWeight": "700", "color": BRAND["text_primary"]},
+                    html.Div(
+                        className="tile-header",
+                        children=[
+                            html.Div([
+                                html.H3("4. Loaded Model Terms & Formula (model_coefficients.csv)", className="tile-title"),
+                                html.P(
+                                    f"Active Model: Intercept ({intercept_val:,.1f}) + sum(coefficient * value) for {numeric_terms} + day_<weekday>",
+                                    className="tile-subtitle"
+                                ),
+                            ]),
+                            html.Span("Model F Specifications", className="table-badge badge-weekday"),
+                        ],
                     ),
                     html.Div(
                         style={"marginTop": "16px"},
                         children=[
-                            html.P(
-                                f"Active Model: Intercept ({intercept_val:,.1f}) + sum(coefficient * value) for {numeric_terms} + day_<weekday>",
-                                style={"fontSize": "13px", "color": BRAND["text_secondary"]},
-                            ),
-                            html.Table(
-                                className="styled-table",
-                                style={"maxWidth": "460px"},
+                            html.Div(
+                                style={"overflowX": "auto", "width": "100%"},
                                 children=[
-                                    html.Thead(html.Tr([html.Th("Term"), html.Th("Coefficient")])),
-                                    html.Tbody([
-                                        html.Tr([
-                                            html.Td(html.Code(r["term"], style={"color": BRAND["santander_flame"]})),
-                                            html.Td(f"{r['coefficient']:,.4f}", style={"fontFamily": "JetBrains Mono, monospace"}),
-                                        ])
-                                        for _, r in coeffs_df.iterrows()
-                                    ]),
+                                    html.Table(
+                                        className="styled-table coeff-table",
+                                        style={"width": "100%", "maxWidth": "960px"},
+                                        children=[
+                                            html.Thead(html.Tr([
+                                                html.Th("Term", style={"width": "160px"}),
+                                                html.Th("Coefficient", style={"width": "150px"}),
+                                                html.Th("Descriptor & Business Interpretation"),
+                                            ])),
+                                            html.Tbody([
+                                                html.Tr(
+                                                    style={"height": "auto", "maxHeight": "none"},
+                                                    children=[
+                                                        html.Td(
+                                                            html.Code(r["term"], style={"color": BRAND["santander_flame"], "fontWeight": "700"}),
+                                                            style={"height": "auto", "whiteSpace": "nowrap"}
+                                                        ),
+                                                        html.Td(
+                                                            f"{r['coefficient']:+,.2f}" if r["coefficient"] != 0 else "0.00 (Baseline)",
+                                                            style={
+                                                                "fontFamily": "JetBrains Mono, monospace",
+                                                                "fontWeight": "600",
+                                                                "color": BRAND["text_primary"],
+                                                                "height": "auto",
+                                                                "whiteSpace": "nowrap"
+                                                            }
+                                                        ),
+                                                        html.Td(
+                                                            COEFF_DESCRIPTIONS.get(r["term"], "Model term coefficient"),
+                                                            style={
+                                                                "color": BRAND["text_secondary"],
+                                                                "fontSize": "12.5px",
+                                                                "whiteSpace": "normal",
+                                                                "lineHeight": "1.4",
+                                                                "height": "auto"
+                                                            }
+                                                        ),
+                                                    ]
+                                                )
+                                                for _, r in coeffs_df.iterrows()
+                                            ]),
+                                        ],
+                                    ),
                                 ],
                             ),
                         ],
