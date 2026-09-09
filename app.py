@@ -163,32 +163,32 @@ def load_model_coefficients(filepath="model_coefficients.csv"):
         if os.path.exists(p):
             return pd.read_csv(p)
 
-    # Model F fallback from MAM_Team_1_Final_Group_Project.ipynb
+    # Deployable variant fallback (adjusted R2 0.710) from MAM Team 1 notebook, Part 5.
+    # Uses only predictors available from Open-Meteo plus calendar-derived terms.
     return pd.DataFrame([
-        ("Intercept", 31811.53),
-        ("temp_c", 634.35),
-        ("humidity", -49.24),
-        ("log_precip", -2492.66),
-        ("windspeed", -168.06),
-        ("solarradiation", 29.58),
-        ("visibility", 117.15),
-        ("sin_doy", -1434.25),
-        ("temp_wknd", 238.31),
-        ("rain_wknd", -741.53),
-        ("covid", -536.29),
-        ("xmas", -8340.91),
-        ("post2023", -2563.89),
-        ("p_temp_c", -393.50),
-        ("p_temp_c2", -16.95),
-        ("p_log_precip", 1150.26),
-        ("p_visibility", -98.65),
+        ("Intercept", 42049.03),
+        ("temp_c", 614.78),
+        ("temp_c2", -11.21),
+        ("humidity", -51.29),
+        ("log_precip", -2851.67),
+        ("windspeed", -121.93),
+        ("cloudcover", -73.87),
+        ("sin_doy", -1011.60),
+        ("cos_doy", -2834.27),
+        ("temp_wknd", 222.45),
+        ("rain_wknd", -734.85),
+        ("xmas", -8073.41),
+        ("post2023", -9874.11),
+        ("p_temp_c", -496.66),
+        ("p_log_precip", 1298.01),
+        ("p_cloudcover", 55.79),
         ("day_Mon", 0.0),
-        ("day_Tue", 2281.19),
-        ("day_Wed", 2545.16),
-        ("day_Thu", 2444.86),
-        ("day_Fri", 799.59),
-        ("day_Sat", -898.91),
-        ("day_Sun", -3247.00),
+        ("day_Tue", 2246.30),
+        ("day_Wed", 2487.45),
+        ("day_Thu", 2394.50),
+        ("day_Fri", 763.28),
+        ("day_Sat", -1017.08),
+        ("day_Sun", -3279.14),
     ], columns=["term", "coefficient"])
 
 COEFF_DESCRIPTIONS = {
@@ -197,18 +197,18 @@ COEFF_DESCRIPTIONS = {
     "humidity": "Relative humidity (%) — damp/muggy conditions reduce rides",
     "log_precip": "Log precipitation log(1+mm) — rain sharply reduces demand",
     "windspeed": "Mean wind speed (km/h) — strong winds discourage cycling",
-    "solarradiation": "Solar radiation (W/m²) — sunny daylight encourages leisure rides",
-    "visibility": "Atmospheric visibility (km) — clearer skies increase travel",
-    "sin_doy": "Annual seasonality cycle (sin(day of year))",
+    "temp_c2": "Squared temperature — the warmth effect flattens once London is hot",
+    "cloudcover": "Cloud cover (%) — overcast days suppress discretionary rides",
+    "sin_doy": "Annual seasonality cycle, sin(day of year)",
+    "cos_doy": "Annual seasonality cycle, cos(day of year)",
     "temp_wknd": "Weekend temperature boost (leisure riders are sun-sensitive)",
     "rain_wknd": "Weekend rain penalty (discretionary weekend trips cancel when wet)",
     "covid": "Lockdown indicator — mobility reduction during pandemic restrictions",
     "xmas": "Christmas holiday shutdown — sharp drop during festive bank holidays",
     "post2023": "Structural shift indicator for dates ≥ 2023 (hybrid work / tariff change)",
     "p_temp_c": "Post-2023 temperature interaction (temp_c × post2023)",
-    "p_temp_c2": "Post-2023 quadratic temperature curve (temp_c² × post2023)",
     "p_log_precip": "Post-2023 rain interaction (log_precip × post2023)",
-    "p_visibility": "Post-2023 visibility interaction (visibility × post2023)",
+    "p_cloudcover": "Post-2023 cloud cover interaction (cloudcover × post2023)",
     "day_Mon": "Baseline reference day (Monday)",
     "day_Tue": "Tuesday commuter premium (relative to Monday)",
     "day_Wed": "Wednesday commuter peak (highest mid-week travel volume)",
@@ -221,7 +221,7 @@ COEFF_DESCRIPTIONS = {
 def prepare_weather_features(df):
     """
     Augment raw Open-Meteo weather data with derived engineering features
-    required by advanced models (such as Model F from MAM_Team_1_Final_Group_Project).
+    required by the deployed model from MAM_Team_1_Final_Group_Project (Part 5).
     """
     df = df.copy()
     dates = pd.to_datetime(df["date"])
@@ -264,15 +264,13 @@ def prepare_weather_features(df):
         df["p_temp_c2"] = df["temp_c2"] * df["post2023"]
     if "p_log_precip" not in df.columns and "log_precip" in df.columns:
         df["p_log_precip"] = df["log_precip"] * df["post2023"]
+    if "p_cloudcover" not in df.columns and "cloudcover" in df.columns:
+        df["p_cloudcover"] = df["cloudcover"] * df["post2023"]
 
-    if "visibility" not in df.columns:
-        df["visibility"] = 24.0  # London average visibility
-    if "p_visibility" not in df.columns:
-        df["p_visibility"] = df["visibility"] * df["post2023"]
-
-    if "solarradiation" not in df.columns:
-        # Seasonally accurate solar radiation for London: ~35 in winter, ~180 in summer
-        df["solarradiation"] = np.maximum(25.0, 100.0 - 70.0 * np.cos(2 * np.pi * doy / 365.25))
+    # NOTE: visibility and solarradiation are NOT provided by Open-Meteo, so the
+    # deployed model deliberately excludes them rather than substituting invented
+    # values. Every predictor below is either returned by the weather feed or
+    # derived from the calendar date.
 
     return df
 
@@ -328,7 +326,7 @@ def get_january_2026_weather():
             "cloudcover": [73.5, 21.0, 45.0, 30.0, 60.0, 85.0, 92.0],
         }
         fallback_df = pd.DataFrame(fallback_data)
-        clean_msg = "Open-Meteo rate limit reached on cloud IP — displaying verified London benchmark archive."
+        clean_msg = "Open-Meteo archive call failed on this host — showing cached January 2026 values stored in app.py, not a live API response."
         _JAN_2026_CACHE = (fallback_df, clean_msg)
         return fallback_df, clean_msg
 
@@ -349,7 +347,7 @@ def get_live_forecast_weather():
             "windspeed": [10.5, 11.2, 14.0, 16.2, 12.0],
             "cloudcover": [50.0, 65.0, 80.0, 75.0, 55.0],
         }
-        return pd.DataFrame(fallback_data), "Open-Meteo live feed temporarily throttled on cloud IP — displaying fallback forecast baseline."
+        return pd.DataFrame(fallback_data), "Open-Meteo forecast call failed on this host — showing placeholder weather stored in app.py, not a live API response."
 
 # -----------------------------------------------------------------------------
 # Component Helpers
@@ -555,8 +553,8 @@ def render_tab_content(selected_tab):
                         className="kpi-stat-card",
                         children=[
                             html.Div("ACTIVE REGRESSION MODEL", className="kpi-label"),
-                            html.Div("Model F (R² 0.72)", className="kpi-value", style={"color": BRAND["mint"]}),
-                            html.Div("24-term linear scoring formula", className="kpi-sub"),
+                            html.Div("Deployable variant (R² 0.710)", className="kpi-value", style={"color": BRAND["mint"]}),
+                            html.Div("23-coefficient linear scoring formula", className="kpi-sub"),
                         ],
                     ),
                 ],
@@ -726,7 +724,7 @@ def render_tab_content(selected_tab):
                                         className="subtile-header",
                                         children=[
                                             html.Div("📊 Predicted Daily Hires", className="subtile-title"),
-                                            html.Span("Model F Output", className="subtile-badge"),
+                                            html.Span("Model Output", className="subtile-badge"),
                                         ],
                                     ),
                                     dcc.Graph(
@@ -927,7 +925,7 @@ def render_tab_content(selected_tab):
                                                 ]),
                                             ]),
 
-                                            # Column B: Atmospheric Factors (Wind, Solar, Visibility)
+                                            # Column B: Atmospheric Factors (Wind, Cloud Cover, Holiday)
                                             html.Div([
                                                 html.Div([
                                                     html.Div(
@@ -957,7 +955,7 @@ def render_tab_content(selected_tab):
                                                     html.Div(
                                                         style={"display": "flex", "justifyContent": "space-between", "marginBottom": "6px", "padding": "0 6px"},
                                                         children=[
-                                                            html.Label("Solar Radiation", className="control-label", style={"margin": "0"}),
+                                                            html.Label("Cloud Cover", className="control-label", style={"margin": "0"}),
                                                             html.Span(id="sim-solar-display", style={"fontWeight": "700", "color": BRAND["amber"], "fontSize": "13px"}),
                                                         ],
                                                     ),
@@ -966,11 +964,11 @@ def render_tab_content(selected_tab):
                                                         children=[
                                                             dcc.Slider(
                                                                 id="sim-solar",
-                                                                min=0, max=250, step=5, value=80,
+                                                                min=0, max=100, step=1, value=50,
                                                                 allow_direct_input=False,
                                                                 marks={
-                                                                    0: {"label": "0 W/m²", "style": {"color": "#FFFFFF", "fontWeight": "600", "fontSize": "11.5px"}},
-                                                                    250: {"label": "250 W/m²", "style": {"color": "#FFFFFF", "fontWeight": "600", "fontSize": "11.5px"}},
+                                                                    0: {"label": "0% clear", "style": {"color": "#FFFFFF", "fontWeight": "600", "fontSize": "11.5px"}},
+                                                                    100: {"label": "100% overcast", "style": {"color": "#FFFFFF", "fontWeight": "600", "fontSize": "11.5px"}},
                                                                 },
                                                             ),
                                                         ],
@@ -981,7 +979,7 @@ def render_tab_content(selected_tab):
                                                     html.Div(
                                                         style={"display": "flex", "justifyContent": "space-between", "marginBottom": "6px", "padding": "0 6px"},
                                                         children=[
-                                                            html.Label("Visibility", className="control-label", style={"margin": "0"}),
+                                                            html.Label("Holiday Period", className="control-label", style={"margin": "0"}),
                                                             html.Span(id="sim-vis-display", style={"fontWeight": "700", "color": BRAND["mint"], "fontSize": "13px"}),
                                                         ],
                                                     ),
@@ -990,11 +988,11 @@ def render_tab_content(selected_tab):
                                                         children=[
                                                             dcc.Slider(
                                                                 id="sim-vis",
-                                                                min=5, max=40, step=1, value=24,
+                                                                min=0, max=1, step=1, value=0,
                                                                 allow_direct_input=False,
                                                                 marks={
-                                                                    5: {"label": "5 km", "style": {"color": "#FFFFFF", "fontWeight": "600", "fontSize": "11.5px"}},
-                                                                    40: {"label": "40 km", "style": {"color": "#FFFFFF", "fontWeight": "600", "fontSize": "11.5px"}},
+                                                                    0: {"label": "Normal day", "style": {"color": "#FFFFFF", "fontWeight": "600", "fontSize": "11.5px"}},
+                                                                    1: {"label": "Christmas week", "style": {"color": "#FFFFFF", "fontWeight": "600", "fontSize": "11.5px"}},
                                                                 },
                                                             ),
                                                         ],
@@ -1045,7 +1043,7 @@ def render_tab_content(selected_tab):
                                     className="tile-subtitle"
                                 ),
                             ]),
-                            html.Span("Model F Specifications", className="table-badge badge-weekday"),
+                            html.Span("Model Specifications", className="table-badge badge-weekday"),
                         ],
                     ),
                     html.Div(
@@ -1293,7 +1291,7 @@ def update_dow_bar_chart(_, start_date, end_date):
         Input("sim-vis", "value"),
     ],
 )
-def update_simulator(day, temp, precip, humidity, wind, solar, vis):
+def update_simulator(day, temp, precip, humidity, wind, cloud, holiday):
     coeffs_df = load_model_coefficients()
     sim_row = pd.DataFrame([{
         "date": pd.Timestamp.now().normalize(),
@@ -1302,9 +1300,8 @@ def update_simulator(day, temp, precip, humidity, wind, solar, vis):
         "precip": float(precip),
         "humidity": float(humidity),
         "windspeed": float(wind),
-        "solarradiation": float(solar),
-        "visibility": float(vis),
-        "cloudcover": 50.0,  # average cloud
+        "cloudcover": float(cloud),
+        "xmas": int(holiday),
     }])
     pred = predict_bikes(sim_row, coeffs_df)[0]
 
@@ -1323,8 +1320,8 @@ def update_simulator(day, temp, precip, humidity, wind, solar, vis):
         f"{precip} mm",
         f"{humidity}%",
         f"{wind} km/h",
-        f"{solar} W/m²",
-        f"{vis} km",
+        f"{cloud}%",
+        "Christmas week" if holiday else "Normal day",
         f"{pred:,}",
         chip,
     )
