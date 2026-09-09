@@ -1,0 +1,1187 @@
+/* ==========================================================================
+   Transport for London — Santander Cycles True Pitch-Black Theme
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+:root {
+    --bg-page: #000000;
+    --bg-tile: #111111;
+    --bg-tile-hover: #171717;
+    --bg-input: #0A0A0A;
+    --border-tile: #242424;
+    --border-highlight: #333333;
+    
+    /* Santander Red Brand Accents */
+    --santander-red: #EC0000;
+    --santander-crimson: #CC0000;
+    --santander-flame: #FF2E2E;
+    
+    /* Functional Status Accents */
+    --accent-mint: #10B981;
+    --accent-amber: #F59E0B;
+    --accent-ice: #38BDF8;
+    
+    /* Typography */
+    --text-primary: #FFFFFF;
+    --text-secondary: #A1A1AA;
+    --text-muted: #71717A;
+    
+    /* Shadows & Elevations */
+    --shadow-tile: 0 10px 30px rgba(0, 0, 0, 0.7);
+    --shadow-hover: 0 14px 40px rgba(0, 0, 0, 0.9);
+
+    /* Dash Native Component Design Tokens (Radix Dropdown & Slider) */
+    --Dash-Spacing: 4px;
+    --Dash-Stroke-Strong: #333333 !important;
+    --Dash-Stroke-Weak: #242424 !important;
+    --Dash-Fill-Interactive-Strong: #EC0000 !important;
+    --Dash-Fill-Interactive-Weak: rgba(236, 0, 0, 0.18) !important;
+    --Dash-Fill-Inverse-Strong: #121212 !important;
+    --Dash-Fill-Inverse-strong: #121212 !important;
+    --Dash-Text-Primary: #FFFFFF !important;
+    --Dash-Text-Strong: #FFFFFF !important;
+    --Dash-Text-Weak: #E4E4E7 !important;
+    --Dash-Text-Disabled: #A1A1AA !important;
+    --Dash-Fill-Primary-Hover: #222222 !important;
+    --Dash-Fill-Primary-Active: rgba(236, 0, 0, 0.28) !important;
+    --Dash-Fill-Disabled: #2A2A2A !important;
+    --Dash-Shading-Strong: rgba(0, 0, 0, 0.9) !important;
+    --Dash-Shading-Weak: rgba(0, 0, 0, 0.6) !important;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background-color: #000000 !important;
+    color: #FFFFFF !important;
+    font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+
+#app-container {
+    background-color: #000000 !important;
+    color: #FFFFFF !important;
+    min-height: 100vh;
+}
+
+/* --------------------------------------------------------------------------
+   Graph Tiles (Distinct Black Panels)
+   -------------------------------------------------------------------------- */
+.dashboard-tile {
+    background-color: var(--bg-tile);
+    border: 1px solid var(--border-tile);
+    border-radius: 14px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow-tile);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dashboard-tile:hover {
+    border-color: var(--border-highlight);
+    box-shadow: var(--shadow-hover);
+}
+
+/* Santander Red Top Accent Strip */
+.dashboard-tile::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--santander-red) 0%, rgba(236, 0, 0, 0.4) 60%, rgba(236, 0, 0, 0.05) 100%);
+}
+
+.tile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.tile-title {
+    margin: 0 0 4px 0;
+    font-size: 16.5px;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.2px;
+}
+
+.tile-subtitle {
+    margin: 0;
+    font-size: 12.5px;
+    color: var(--text-secondary);
+}
+
+/* --------------------------------------------------------------------------
+   Executive Radial / Segmented Navigation Switch (Maximizes Screen Space)
+   -------------------------------------------------------------------------- */
+/* --------------------------------------------------------------------------
+   Executive Radial / Segmented Navigation Switch (Screenshot 2)
+   -------------------------------------------------------------------------- */
+.executive-radio-tabs {
+    display: inline-flex !important;
+    align-items: center !important;
+    background-color: #121212 !important;
+    border: 1px solid var(--border-tile) !important;
+    border-radius: 30px !important;
+    padding: 4px 8px !important;
+    gap: 12px !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6) !important;
+}
+
+.executive-radio-tabs label.dash-options-list-option,
+.executive-radio-tabs label {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    padding: 8px 18px !important;
+    margin: 0 !important;
+    border-radius: 22px !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    color: var(--text-secondary) !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+}
+
+.executive-radio-tabs label:hover {
+    color: #FFFFFF !important;
+    background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Selected tab: Crisp white text, subtle dark pill highlight, NO red text glow */
+.executive-radio-tabs label:has(input:checked) {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    color: #FFFFFF !important;
+    font-weight: 700 !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+}
+
+.executive-radio-tabs label:has(input:checked) * {
+    background: transparent !important;
+    background-color: transparent !important;
+    color: #FFFFFF !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+}
+
+.executive-radio-tabs .dash-options-list-option-wrapper {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.executive-radio-tabs input[type="radio"] {
+    margin: 0 10px 0 0 !important;
+}
+
+/* --------------------------------------------------------------------------
+   Custom Radio Items: Generous spacing between buttons and labels (Screenshot 1)
+   -------------------------------------------------------------------------- */
+.custom-radio-items {
+    background: transparent !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    gap: 10px 32px !important;
+}
+
+.custom-radio-items label.dash-options-list-option,
+.custom-radio-items label {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    margin: 0 28px 0 0 !important;
+    padding: 6px 4px !important;
+    cursor: pointer !important;
+    font-size: 13px !important;
+    color: var(--text-secondary) !important;
+    font-weight: 500 !important;
+    transition: color 0.2s ease !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.custom-radio-items label.dash-options-list-option:last-child,
+.custom-radio-items label:last-child {
+    margin-right: 0 !important;
+}
+
+.custom-radio-items label:hover {
+    color: #FFFFFF !important;
+}
+
+.custom-radio-items label:has(input:checked) {
+    color: #FFFFFF !important;
+    font-weight: 600 !important;
+}
+
+.custom-radio-items .dash-options-list-option-wrapper {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.custom-radio-items input[type="radio"] {
+    margin: 0 10px 0 0 !important;
+}
+
+/* Symmetrical 2-Column Grid for Period Filter (Fallback) */
+#date-period-filter,
+#date-period-filter.custom-radio-items,
+.period-filter-grid {
+    display: grid !important;
+    grid-template-columns: 140px max-content !important;
+    column-gap: 24px !important;
+    row-gap: 12px !important;
+    align-items: center !important;
+    width: fit-content !important;
+}
+
+/* Ensure the parent tile allows calendar popup to display fully above other tiles */
+.dashboard-tile:has(#date-range-filter),
+.dashboard-tile:has(.dash-datepicker),
+.dashboard-tile:has(.DateRangePicker) {
+    overflow: visible !important;
+    z-index: 1000 !important;
+}
+
+/* --------------------------------------------------------------------------
+   Dash 4 DatePickerRange (100% Solid Opaque Pitch-Black Theme)
+   -------------------------------------------------------------------------- */
+.dash-datepicker,
+.dash-datepicker-portal {
+    background: transparent !important;
+}
+
+.dash-datepicker-input-wrapper {
+    background-color: #0A0A0A !important;
+    border: 1px solid var(--border-tile) !important;
+    border-radius: 8px !important;
+    padding: 3px 10px !important;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.dash-datepicker-input-wrapper:hover,
+.dash-datepicker-input-wrapper:focus-within {
+    border-color: var(--santander-red) !important;
+    box-shadow: 0 0 10px rgba(236, 0, 0, 0.25) !important;
+}
+
+.dash-datepicker-input {
+    background-color: transparent !important;
+    color: #FFFFFF !important;
+    border: none !important;
+    font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    text-align: center !important;
+    cursor: pointer !important;
+}
+
+.dash-datepicker-caret-icon svg,
+.dash-datepicker-range-arrow svg {
+    fill: var(--santander-red) !important;
+    color: var(--santander-red) !important;
+}
+
+/* Calendar Popup Window & Portal Containers: 100% Solid Opaque #121212 */
+.dash-datepicker-content,
+div.dash-datepicker-content,
+.dash-datepicker-portal .dash-datepicker-calendar-wrapper,
+.dash-datepicker-calendar-wrapper,
+.dash-datepicker-calendar-container {
+    background: #121212 !important;
+    background-color: #121212 !important;
+    opacity: 1 !important;
+    z-index: 999999 !important;
+    border: 1px solid #282828 !important;
+    border-radius: 12px !important;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.98), 0 0 0 1px #282828 !important;
+}
+
+.dash-datepicker-calendar,
+.dash-datepicker-calendar tbody,
+.dash-datepicker-calendar tr {
+    background: #121212 !important;
+    background-color: #121212 !important;
+    opacity: 1 !important;
+}
+
+/* Header & Controls */
+.dash-datepicker-controls {
+    background: #121212 !important;
+    color: #FFFFFF !important;
+    gap: 8px !important;
+}
+
+.dash-datepicker-controls select,
+.dash-datepicker-controls button,
+.dash-datepicker-month-nav {
+    background-color: #1A1A1A !important;
+    color: #FFFFFF !important;
+    border: 1px solid #333333 !important;
+    border-radius: 6px !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+}
+
+.dash-datepicker-month-nav {
+    color: var(--santander-red) !important;
+}
+
+.dash-datepicker-month-nav:hover:not(:disabled) {
+    background-color: #2D0A0A !important;
+    border-color: var(--santander-red) !important;
+    color: #FFFFFF !important;
+}
+
+.dash-datepicker-calendar-month-header,
+.dash-datepicker-calendar th {
+    background: #121212 !important;
+    background-color: #121212 !important;
+    color: var(--text-secondary) !important;
+    font-size: 11.5px !important;
+    font-weight: 600 !important;
+}
+
+/* Calendar Day Cells: 100% Solid, never transparent */
+.dash-datepicker-calendar td,
+.dash-datepicker-calendar td.dash-datepicker-calendar-date-inside {
+    background: #121212 !important;
+    background-color: #121212 !important;
+    color: #E4E4E7 !important;
+    font-size: 12px !important;
+    font-weight: 500 !important;
+    opacity: 1 !important;
+    border-radius: 4px !important;
+}
+
+.dash-datepicker-calendar td:hover {
+    background: #2D0A0A !important;
+    background-color: #2D0A0A !important;
+    color: #FFFFFF !important;
+}
+
+/* In-range highlighted days: 100% Solid dark crimson #380808 (NO alpha translucency) */
+.dash-datepicker-calendar td.dash-datepicker-calendar-date-highlighted:not(.dash-datepicker-calendar-date-outside),
+.dash-datepicker-calendar td.dash-datepicker-calendar-date-highlighted {
+    background: #380808 !important;
+    background-color: #380808 !important;
+    color: #FFFFFF !important;
+    opacity: 1 !important;
+}
+
+/* Selected start & end days: Solid Santander Red */
+.dash-datepicker-calendar td.dash-datepicker-calendar-date-selected:not(.dash-datepicker-calendar-date-outside),
+.dash-datepicker-calendar td.dash-datepicker-calendar-date-selected {
+    background: var(--santander-red) !important;
+    background-color: var(--santander-red) !important;
+    color: #FFFFFF !important;
+    font-weight: 700 !important;
+    opacity: 1 !important;
+}
+
+/* Outside / disabled days: Solid dark background */
+.dash-datepicker-calendar td.dash-datepicker-calendar-date-outside,
+.dash-datepicker-calendar td.dash-datepicker-calendar-date-disabled {
+    background: #0D0D0D !important;
+    background-color: #0D0D0D !important;
+    color: #4B5563 !important;
+    opacity: 0.5 !important;
+}
+
+/* Legacy react-dates Fallback rules */
+.DateRangePicker_picker,
+.DateRangePicker_picker__show,
+.DayPicker,
+.DayPicker > div,
+.CalendarMonthGrid,
+.CalendarMonth,
+.CalendarMonth_table,
+.CalendarMonth_table tbody,
+.CalendarMonth_table tr,
+td.CalendarDay {
+    background: #121212 !important;
+    background-color: #121212 !important;
+    opacity: 1 !important;
+    z-index: 999999 !important;
+}
+.CalendarDay__selected_span {
+    background: #380808 !important;
+    background-color: #380808 !important;
+    opacity: 1 !important;
+}
+.CalendarDay__selected {
+    background: var(--santander-red) !important;
+    background-color: var(--santander-red) !important;
+    opacity: 1 !important;
+}
+
+/* General reset for wrappers and circular bubble */
+.dash-radioitems {
+    background: transparent !important;
+}
+
+.dash-options-list-option-wrapper,
+.dash-options-list-option-text {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* Custom Circular Radio Bubble: Bubble only is filled red, no square, no glow */
+input[type="radio"],
+.dash-options-list-option-checkbox,
+input[type="radio"].dash-options-list-option-checkbox,
+.dash-radioitems input[type="radio"],
+.executive-radio-tabs input[type="radio"],
+.custom-radio-items input[type="radio"] {
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    width: 16px !important;
+    height: 16px !important;
+    min-width: 16px !important;
+    min-height: 16px !important;
+    border-radius: 50% !important;
+    border: 2px solid #52525B !important;
+    background-color: #141414 !important;
+    outline: none !important;
+    box-shadow: none !important;
+    margin: 0 10px 0 0 !important;
+    padding: 0 !important;
+    cursor: pointer !important;
+    display: inline-grid !important;
+    place-content: center !important;
+    vertical-align: middle !important;
+    transition: border-color 0.2s ease, background-color 0.2s ease !important;
+}
+
+input[type="radio"]:hover,
+.dash-options-list-option-checkbox:hover {
+    border-color: #A1A1AA !important;
+}
+
+/* When selected: ONLY the circular bubble is filled Santander Red with center dot */
+input[type="radio"]:checked,
+.dash-options-list-option-checkbox:checked,
+.executive-radio-tabs input[type="radio"]:checked,
+.custom-radio-items input[type="radio"]:checked {
+    border-color: var(--santander-red) !important;
+    background-color: var(--santander-red) !important;
+    box-shadow: 0 0 6px rgba(236, 0, 0, 0.4) !important;
+}
+
+input[type="radio"]:checked::after,
+.dash-options-list-option-checkbox:checked::after {
+    content: "" !important;
+    width: 6px !important;
+    height: 6px !important;
+    border-radius: 50% !important;
+    background-color: #FFFFFF !important;
+}
+
+.custom-tabs-container {
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--border-tile);
+    display: flex;
+    gap: 8px;
+}
+
+.custom-tab:hover {
+    color: var(--text-primary) !important;
+    background-color: rgba(236, 0, 0, 0.06) !important;
+}
+
+.custom-tab--selected {
+    color: #FFFFFF !important;
+    border-bottom: 3px solid var(--santander-red) !important;
+    background-color: rgba(236, 0, 0, 0.1) !important;
+}
+
+/* --------------------------------------------------------------------------
+   Santander Animated Bike Mascot Container
+   -------------------------------------------------------------------------- */
+.bike-mascot-container {
+    width: 90px;
+    height: 56px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle, rgba(236, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0) 72%);
+    border-radius: 12px;
+    padding: 2px 4px;
+    cursor: pointer;
+    transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.bike-mascot-container:hover {
+    transform: scale(1.08);
+    filter: drop-shadow(0 0 12px rgba(236, 0, 0, 0.6));
+}
+
+/* Santander Network Badge */
+.santander-badge {
+    background: linear-gradient(135deg, rgba(236, 0, 0, 0.15) 0%, rgba(204, 0, 0, 0.05) 100%);
+    border: 1px solid rgba(236, 0, 0, 0.4);
+    border-radius: 8px;
+    padding: 6px 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #FF5C5C;
+}
+
+/* Live Pulse Dot */
+.pulse-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--santander-red);
+    box-shadow: 0 0 0 0 rgba(236, 0, 0, 0.8);
+    animation: santanderPulse 1.8s infinite;
+}
+
+@keyframes santanderPulse {
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(236, 0, 0, 0.8);
+    }
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 6px rgba(236, 0, 0, 0);
+    }
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(236, 0, 0, 0);
+    }
+}
+
+/* --------------------------------------------------------------------------
+   Controls & Dropdown Inputs (High Visibility Black Theme)
+   -------------------------------------------------------------------------- */
+.control-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+    display: block;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+}
+
+/* Base Dropdown Containers */
+.dash-dropdown,
+.dash-dropdown-trigger,
+.Select,
+.Select-control,
+div[class*="-control"] {
+    background-color: #0A0A0A !important;
+    border: 1px solid var(--border-tile) !important;
+    border-radius: 8px !important;
+    color: #FFFFFF !important;
+    min-height: 44px !important;
+    box-sizing: border-box !important;
+}
+
+.dash-dropdown:hover,
+.dash-dropdown-trigger:hover,
+.dash-dropdown:focus,
+.Select-control:hover,
+div[class*="-control"]:hover,
+div[class*="-control"][class*="-is-focused"] {
+    border-color: var(--santander-red) !important;
+    box-shadow: 0 0 0 1px var(--santander-red) !important;
+}
+
+/* Dropdown Selected Value & Input Text (High Contrast White) */
+.dash-dropdown-value,
+.dash-dropdown-value-item,
+.dash-dropdown-value *,
+.Select-value,
+.Select-value-label,
+div[class*="-singleValue"],
+div[class*="singleValue"],
+div[class*="-ValueContainer"] *,
+.Select-input > input,
+div[class*="-Input"] input,
+div[class*="Input"] input {
+    color: #FFFFFF !important;
+    font-weight: 600 !important;
+    font-size: 14px !important;
+    opacity: 1 !important;
+}
+
+.dash-dropdown-placeholder,
+.Select-placeholder,
+div[class*="-placeholder"],
+div[class*="placeholder"] {
+    color: #A1A1AA !important;
+    font-size: 14px !important;
+}
+
+.dash-dropdown-trigger-icon,
+.dash-dropdown-trigger-icon svg {
+    color: #FFFFFF !important;
+    fill: #FFFFFF !important;
+}
+
+/* Dropdown Menu & Popover Container */
+.dash-dropdown-content,
+.Select-menu-outer,
+div[class*="-menu"],
+div[class*="menu"] {
+    background-color: #141414 !important;
+    border: 1px solid var(--border-highlight) !important;
+    border-radius: 8px !important;
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.95) !important;
+    z-index: 9999 !important;
+}
+
+/* Dropdown Search Box */
+.dash-dropdown-search-container {
+    background-color: #0A0A0A !important;
+    border: 1px solid var(--border-highlight) !important;
+    border-radius: 6px !important;
+}
+
+.dash-dropdown-search {
+    color: #FFFFFF !important;
+    font-size: 13.5px !important;
+}
+
+/* Dropdown Option Items */
+.dash-dropdown-option,
+.Select-option,
+div[class*="-option"],
+div[class*="option"],
+div[role="option"] {
+    background-color: #141414 !important;
+    color: #FFFFFF !important;
+    padding: 12px 16px !important;
+    font-size: 13.5px !important;
+    font-weight: 500 !important;
+    cursor: pointer !important;
+    box-shadow: none !important;
+}
+
+.dash-dropdown-option:hover,
+.dash-dropdown-option:focus,
+.Select-option:hover,
+div[class*="-option"]:hover,
+div[class*="option"]:hover,
+div[role="option"]:hover,
+div[class*="-is-focused"] {
+    background-color: #242424 !important;
+    color: #FFFFFF !important;
+}
+
+.dash-dropdown-option[data-selected="true"],
+.dash-dropdown-option:has(input[type="radio"]:checked),
+.Select-option.is-selected,
+div[class*="-option"][class*="-is-selected"],
+div[class*="option"][class*="selected"] {
+    background-color: rgba(236, 0, 0, 0.24) !important;
+    color: #FF5C5C !important;
+    font-weight: 700 !important;
+}
+
+
+
+/* Action Buttons */
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background-color: #1A1A1A;
+    color: #FFFFFF;
+    border: 1px solid var(--border-tile);
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.action-btn:hover {
+    background-color: rgba(236, 0, 0, 0.18);
+    border-color: var(--santander-red);
+    color: #FFFFFF;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(236, 0, 0, 0.3);
+}
+
+/* --------------------------------------------------------------------------
+   Tables
+   -------------------------------------------------------------------------- */
+.styled-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    color: #FFFFFF;
+}
+
+.styled-table th {
+    background-color: #0A0A0A;
+    color: var(--text-secondary);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 10.5px;
+    letter-spacing: 0.4px;
+    padding: 8px 7px;
+    text-align: left;
+    border-bottom: 2px solid var(--border-tile);
+    height: 44px;
+    max-height: 44px;
+    box-sizing: border-box;
+    white-space: nowrap;
+}
+
+.styled-table tr {
+    height: 46px;
+    max-height: 46px;
+    box-sizing: border-box;
+}
+
+.styled-table td {
+    padding: 8px 7px;
+    border-bottom: 1px solid #1E1E1E;
+    font-feature-settings: "tnum";
+    height: 46px;
+    max-height: 46px;
+    box-sizing: border-box;
+    white-space: nowrap;
+    font-size: 12px;
+}
+
+.styled-table tr:hover td {
+    background-color: var(--bg-tile-hover);
+}
+
+.styled-table tr:last-child td {
+    border-bottom: none;
+}
+
+.table-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.badge-weekday {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #E4E4E7;
+}
+
+.badge-weekend {
+    background-color: rgba(236, 0, 0, 0.2);
+    color: #FF5C5C;
+}
+
+.badge-prediction {
+    background-color: rgba(16, 185, 129, 0.18);
+    color: var(--accent-mint);
+    font-weight: 700;
+    font-size: 13px;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+/* --------------------------------------------------------------------------
+   Slider Controls & Marks (High Visibility White/Silver)
+   -------------------------------------------------------------------------- */
+/* Dash Native (Radix) Slider Marks */
+.dash-slider-mark,
+.dash-slider-mark-outside-selection,
+.dash-slider-root .dash-slider-mark,
+.dash-slider-root span,
+.rc-slider-mark-text,
+.rc-slider-mark span,
+div[class*="rc-slider-mark"] span {
+    color: #FFFFFF !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    font-family: 'Outfit', sans-serif !important;
+    opacity: 1 !important;
+}
+
+.dash-slider-mark-outside-selection {
+    color: #E4E4E7 !important;
+}
+
+.dash-slider-mark:before {
+    background-color: #52525B !important;
+}
+
+.dash-slider-track {
+    background-color: #242424 !important;
+    height: 6px !important;
+}
+
+.dash-slider-range {
+    background-color: var(--santander-red) !important;
+    height: 6px !important;
+}
+
+.dash-slider-thumb {
+    background-color: var(--santander-red) !important;
+    border: 2px solid #FFFFFF !important;
+    box-shadow: 0 0 10px rgba(236, 0, 0, 0.8) !important;
+}
+
+.dash-slider-thumb:hover,
+.dash-slider-thumb:focus {
+    background-color: var(--santander-flame) !important;
+    box-shadow: 0 0 14px rgba(236, 0, 0, 0.95) !important;
+    transform: scale(1.18) !important;
+}
+
+.dash-slider-dot {
+    background-color: var(--santander-red) !important;
+}
+
+.dash-slider-dot-outside-selection {
+    background-color: #3F3F46 !important;
+}
+
+.dash-slider-tooltip {
+    background-color: #1A1A1A !important;
+    color: #FFFFFF !important;
+    border: 1px solid #333333 !important;
+    border-radius: 6px !important;
+}
+
+/* Fallback RC-Slider Support */
+.rc-slider-mark-text-active {
+    color: #FFFFFF !important;
+    font-weight: 700 !important;
+}
+
+.rc-slider-track {
+    background-color: var(--santander-red) !important;
+    height: 6px !important;
+}
+
+.rc-slider-rail {
+    background-color: #242424 !important;
+    height: 6px !important;
+}
+
+.rc-slider-handle {
+    border-color: var(--santander-red) !important;
+    background-color: #000000 !important;
+    width: 16px !important;
+    height: 16px !important;
+    margin-top: -5px !important;
+    box-shadow: 0 0 8px rgba(236, 0, 0, 0.7) !important;
+}
+
+.rc-slider-handle:hover,
+.rc-slider-handle:active,
+.rc-slider-handle-dragging {
+    border-color: var(--santander-flame) !important;
+    box-shadow: 0 0 12px rgba(236, 0, 0, 0.9) !important;
+}
+
+/* Interactive Simulator Tile: Clean 2-Column Sliders & Segmented Day Bar */
+.simulator-layout {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 40px;
+    align-items: center;
+    padding-bottom: 14px;
+}
+
+.simulator-controls-container {
+    width: 100%;
+    padding-bottom: 14px;
+}
+
+.simulator-sliders-2col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    padding-bottom: 10px;
+}
+
+/* Ensure slider containers allocate vertical space for bottom mark labels */
+.rc-slider,
+.dash-slider-wrapper {
+    margin-bottom: 14px !important;
+}
+
+/* Prevent start and end slider marks from overflowing their track */
+.rc-slider-mark-text:first-child,
+.dash-slider-mark:first-child {
+    text-align: left !important;
+    transform: translateX(0) !important;
+    left: 0% !important;
+}
+
+.rc-slider-mark-text:last-child,
+.dash-slider-mark:last-child {
+    text-align: right !important;
+    transform: translateX(-100%) !important;
+    left: 100% !important;
+}
+
+@media (max-width: 1120px) {
+    .simulator-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .simulator-sliders-2col {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Day Bar: Full length segmented button bar across the visual top */
+.sim-day-bar {
+    display: grid !important;
+    grid-template-columns: repeat(7, 1fr) !important;
+    gap: 8px !important;
+    width: 100% !important;
+    background: #0D0D0D !important;
+    padding: 4px !important;
+    border: 1px solid var(--border-tile) !important;
+    border-radius: 10px !important;
+}
+
+.sim-day-bar label.dash-options-list-option,
+.sim-day-bar label,
+.sim-day-bar .dash-options-list-option-wrapper {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 8px 0 !important;
+    margin: 0 !important;
+    border-radius: 7px !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    color: var(--text-secondary) !important;
+    cursor: pointer !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    transition: all 0.2s ease !important;
+}
+
+.sim-day-bar input[type="radio"] {
+    display: none !important;
+}
+
+.sim-day-bar label:hover {
+    color: #FFFFFF !important;
+    background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.sim-day-bar label:has(input:checked) {
+    background-color: var(--santander-red) !important;
+    color: #FFFFFF !important;
+    font-weight: 700 !important;
+    box-shadow: 0 2px 10px rgba(236, 0, 0, 0.45) !important;
+}
+
+.sim-day-bar label:has(input:checked) * {
+    color: #FFFFFF !important;
+    background: transparent !important;
+}
+
+/* Hide extra Dash 4 number input boxes next to sliders */
+.dash-slider-input {
+    display: none !important;
+}
+
+.sim-gauge-tile {
+    background: linear-gradient(145deg, rgba(236, 0, 0, 0.16) 0%, rgba(18, 18, 18, 0.98) 100%);
+    border: 1px solid rgba(236, 0, 0, 0.45);
+    border-radius: 16px;
+    padding: 32px 24px;
+    text-align: center;
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.75), 0 0 24px rgba(236, 0, 0, 0.12);
+}
+
+/* Alert banner */
+.alert-banner {
+    background-color: rgba(245, 158, 11, 0.12);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    color: var(--accent-amber);
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* --------------------------------------------------------------------------
+   Prediction Tab: Table & Chart Height Alignment
+   -------------------------------------------------------------------------- */
+.prediction-split-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+    gap: 24px;
+    align-items: stretch;
+}
+
+.prediction-panel {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.prediction-card-frame {
+    background-color: #0A0A0A;
+    border: 1px solid var(--border-tile);
+    border-radius: 10px;
+    overflow: hidden;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* --------------------------------------------------------------------------
+   Subtiles (Distinct visual panels inside main dashboard tiles)
+   -------------------------------------------------------------------------- */
+.dashboard-subtile {
+    background-color: #0A0A0A;
+    border: 1px solid #222222;
+    border-radius: 12px;
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    box-sizing: border-box;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.dashboard-subtile:hover {
+    border-color: #383838;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8), 0 0 12px rgba(236, 0, 0, 0.08);
+}
+
+.subtile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #1C1C1C;
+    height: 24px;
+    box-sizing: border-box;
+}
+
+.subtile-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #FFFFFF;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    letter-spacing: -0.1px;
+}
+
+.subtile-badge {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    background-color: #141414;
+    border: 1px solid #282828;
+    padding: 2px 7px;
+    border-radius: 6px;
+}
+
+/* --------------------------------------------------------------------------
+   Executive KPI Stat Ribbon Cards
+   -------------------------------------------------------------------------- */
+.kpi-stat-card {
+    background-color: #0E0E0E;
+    border: 1px solid var(--border-tile);
+    border-radius: 12px;
+    padding: 16px 20px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow-tile);
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.kpi-stat-card:hover {
+    transform: translateY(-2px);
+    border-color: #3A3A3A;
+    box-shadow: var(--shadow-hover);
+}
+
+.kpi-stat-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 100%;
+    background-color: var(--santander-red);
+}
+
+.kpi-label {
+    font-size: 10.5px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+}
+
+.kpi-value {
+    font-size: 22px;
+    font-weight: 800;
+    font-family: 'JetBrains Mono', monospace;
+    color: #FFFFFF;
+    margin-bottom: 4px;
+    line-height: 1.15;
+}
+
+.kpi-sub {
+    font-size: 11.5px;
+    color: var(--text-muted);
+}
+
+

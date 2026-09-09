@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: london-bikes-dashboard
+    runtime: python
+    buildCommand: pip install uv && uv sync
+    startCommand: uv run gunicorn app:server
+    plan: free
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.0
