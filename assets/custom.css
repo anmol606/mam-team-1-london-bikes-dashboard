@@ -1184,4 +1184,25 @@ div[class*="rc-slider-mark"] span {
     color: var(--text-muted);
 }
 
+/* Model Coefficients Table */
+.coeff-table {
+    border-collapse: collapse;
+}
+
+.coeff-table tr,
+.coeff-table td {
+    height: auto !important;
+    max-height: none !important;
+}
+
+.coeff-table th {
+    padding: 10px 12px !important;
+}
+
+.coeff-table td {
+    padding: 10px 12px !important;
+    vertical-align: top;
+}
+
+
 
